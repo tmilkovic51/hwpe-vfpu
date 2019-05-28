@@ -1,3 +1,6 @@
 [submodule "hwpe-stream"]
 	path = hwpe-stream
 	url = git@github.com:lukamac/hwpe-stream.git
+[submodule "hwpe-ctrl"]
+	path = hwpe-ctrl
+	url = git@github.com:lukamac/hwpe-ctrl.git
