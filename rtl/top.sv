@@ -7,7 +7,7 @@
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
 
-module top
+module hwpe_top
 #(
   parameter int unsigned N_CORES = 2,
   parameter int unsigned ID_WIDTH = 16,
