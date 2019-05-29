@@ -111,7 +111,7 @@ module hwpe_test
 
     .push_i(operands),
     .pop_o(operands_fenced)
-  )
+  );
 
   
 // STREAM SINK
@@ -142,7 +142,7 @@ module hwpe_test
     .clear_i (clear_i),
     .flags_o (store_fifo_flags_o),
 	
-    .tcdm_slave (tcdm_internal_sink[0]),
+    .tcdm_slave ({tcdm_internal_sink}),
     .tcdm_master (tcdm_master_store)
 );
 
