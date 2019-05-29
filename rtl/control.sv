@@ -39,7 +39,7 @@ module hwpe_test
 //======================================================//
 
 // HWPE CONTROL
-  module hwpe_ctrl_slave #(
+  hwpe_ctrl_slave #(
     .N_CORES (2),
     .N_CONTEXT (2),
     .N_EVT (REGFILE_N_EVT),
