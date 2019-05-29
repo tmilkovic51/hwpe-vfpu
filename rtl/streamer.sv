@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 
 import hwpe_stream_package::*;
+import hwpe_ctrl_package::*;
 
 module hwpe_test
 #(
@@ -63,6 +64,7 @@ module hwpe_test
 //                    INSTANTIATIONS                    //
 //======================================================//
 
+// HWPE STREAM
   genvar i;
   for(i = 0; i < NB_OPERANDS; i++) begin
     hwpe_stream_tcdm_fifo_load #(
@@ -74,7 +76,7 @@ module hwpe_test
       .clear_i (clear_i),
       .flags_o (load_fifo_flags_o[i]),
       .ready_i (stream_source_fifo_ready[i]),
-
+      
       .tcdm_slave (tcdm_internal_source[i]),
       .tcdm_master (tcdm_master_load[i])
     );
@@ -112,7 +114,7 @@ module hwpe_test
     .push_i(operands),
     .pop_o(operands_fenced)
   );
-
+  
   
 // STREAM SINK
   hwpe_stream_sink #(
