@@ -3,10 +3,11 @@
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
 
-module hwpe_test
+module control
 #(
   parameter int unsigned DATA_WIDTH  = 32,
-  parameter int unsigned NB_OPERANDS = 2
+  parameter int unsigned NB_OPERANDS = 2,
+  parameter int unsigned ID_WIDTH = 16
 )
 (
   input  logic                  clk_i,
@@ -46,7 +47,7 @@ module hwpe_test
     .N_IO_REGS (16),
     .N_GENERIC_REGS (0),
     .N_SW_EVT (0), // not used
-    .ID_WIDTH (16)
+    .ID_WIDTH (ID_WIDTH)
   ) hwpe_control (
     .clk_i (clk_i),
     .rst_ni (rst_ni),

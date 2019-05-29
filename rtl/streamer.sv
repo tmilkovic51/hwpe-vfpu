@@ -3,7 +3,7 @@
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
 
-module hwpe_test
+module streamer
 #(
   parameter int unsigned DATA_WIDTH  = 32,
   parameter int unsigned NB_OPERANDS = 2
