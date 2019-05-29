@@ -74,7 +74,7 @@ module hwpe_top_wrap
     .rst_n(rst_n),
     .evt(evt),
     .tcdm(tcdm),
-    .slave_config_interface(tcdm)
+    .slave_config_interface(periph)
   );
 
 endmodule

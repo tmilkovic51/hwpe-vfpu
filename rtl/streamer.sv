@@ -34,11 +34,11 @@ module streamer
   
   logic stream_source_fifo_ready[NB_OPERANDS];
   
-  hwpe_stream_intf_tcdm tcdm_internal_source[NB_OPERANDS] (
+  hwpe_stream_intf_tcdm tcdm_internal_source[NB_OPERANDS][0:0] (
     .clk ( clk_i )
   );
   
-  hwpe_stream_intf_tcdm tcdm_internal_sink (
+  hwpe_stream_intf_tcdm tcdm_internal_sink[0:0] (
     .clk ( clk_i )
   );
   
@@ -77,7 +77,7 @@ module streamer
       .flags_o (load_fifo_flags_o[i]),
       .ready_i (stream_source_fifo_ready[i]),
       
-      .tcdm_slave (tcdm_internal_source[i]),
+      .tcdm_slave (tcdm_internal_source[i][0]),
       .tcdm_master (tcdm_master_load[i])
     );
 
@@ -93,7 +93,7 @@ module streamer
       .test_mode_i (1'b0),
       .clear_i (clear_i),
       
-      .tcdm ({tcdm_internal_source[i]}),
+      .tcdm (tcdm_internal_source[i]),
       .stream (operands[i]),
       
       .tcdm_fifo_ready_o (stream_source_fifo_ready[i]),
@@ -144,7 +144,7 @@ module streamer
     .clear_i (clear_i),
     .flags_o (store_fifo_flags_o),
 	
-    .tcdm_slave ({tcdm_internal_sink}),
+    .tcdm_slave (tcdm_internal_sink[0]),
     .tcdm_master (tcdm_master_store)
 );
 

@@ -3,3 +3,6 @@ create_project:
 
 clean:
 	rm -rf .Xil simulation.cache simulation.hw simulation.ip_user_files simulation.sim simulation.xpr
+
+gui:
+	vivado simulation.xpr -nolog -nojournal
