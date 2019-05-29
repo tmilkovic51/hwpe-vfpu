@@ -32,6 +32,7 @@ module top
   ctrl_sourcesink_t source_stream_ctrl[`NB_OPERANDS];
   flags_sourcesink_t sink_stream_flags;
   ctrl_sourcesink_t sink_stream_ctrl;
+  flags_slave_t control_flags;
   
 //======================================================//
 //                    INSTANTIATIONS                    //
@@ -59,7 +60,9 @@ module top
   control #(
     .DATA_WIDTH(32),
     .NB_OPERANDS(`NB_OPERANDS),
-    .ID_WIDTH(ID_WIDTH)
+    .ID_WIDTH(ID_WIDTH),
+    .N_CORES(N_CORES),
+    .N_CONTEXT(2)
   ) control_inst (
     .clk_i(clk),
     .rst_ni(rst_n),
@@ -71,9 +74,11 @@ module top
     .sink_stream_ctrl_o(sink_stream_ctrl),
     .sink_stream_flags_i(sink_stream_flags),
     
-    .ctrl_flags_o(),
+    .ctrl_flags_o(control_flags),
     
     .slave_config_interface(slave_config_interface)
   );
+  
+  assign evt = control_flags.evt[N_CORES-1:0];
 
 endmodule

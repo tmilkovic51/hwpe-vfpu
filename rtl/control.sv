@@ -7,7 +7,9 @@ module control
 #(
   parameter int unsigned DATA_WIDTH  = 32,
   parameter int unsigned NB_OPERANDS = 2,
-  parameter int unsigned ID_WIDTH = 16
+  parameter int unsigned ID_WIDTH = 16,
+  parameter int unsigned N_CORES = 2,
+  parameter int unsigned N_CONTEXT = 2
 )
 (
   input  logic                  clk_i,
@@ -41,8 +43,8 @@ module control
 
 // HWPE CONTROL
   hwpe_ctrl_slave #(
-    .N_CORES (2),
-    .N_CONTEXT (2),
+    .N_CORES (N_CORES),
+    .N_CONTEXT (N_CONTEXT),
     .N_EVT (REGFILE_N_EVT),
     .N_IO_REGS (16),
     .N_GENERIC_REGS (0),
@@ -66,7 +68,7 @@ module control
   assign slave_control.done = sink_stream_flags_i.done; // everything is done when sink stream is done
   assign slave_control.evt = 0; // events currently not used
   
-  // TRIGGER START
+  // START TRIGGER ON STREAM INTERFACES
   assign source_stream_ctrl_o[0].req_start = ctrl_flags_o.start;
   assign source_stream_ctrl_o[1].req_start = ctrl_flags_o.start;
   assign sink_stream_ctrl_o.req_start = ctrl_flags_o.start;
@@ -83,7 +85,7 @@ module control
   assign source_stream_ctrl_o[0].addressgen_ctrl.realign_type = 0;
   assign source_stream_ctrl_o[0].addressgen_ctrl.line_length_remainder = 0;
   
-    // OPERAND B ADDRESGEN CONTROL
+  // OPERAND B ADDRESGEN CONTROL
   assign source_stream_ctrl_o[1].addressgen_ctrl.base_addr = registers.hwpe_params[4];
   assign source_stream_ctrl_o[1].addressgen_ctrl.trans_size = registers.hwpe_params[12];
   assign source_stream_ctrl_o[1].addressgen_ctrl.line_stride = registers.hwpe_params[5][31:16];
@@ -95,7 +97,7 @@ module control
   assign source_stream_ctrl_o[1].addressgen_ctrl.realign_type = 0;
   assign source_stream_ctrl_o[1].addressgen_ctrl.line_length_remainder = 0;
   
-    // OPERAND A ADDRESGEN CONTROL
+  // RESULT ADDRESGEN CONTROL
   assign sink_stream_ctrl_o.addressgen_ctrl.base_addr = registers.hwpe_params[8];
   assign sink_stream_ctrl_o.addressgen_ctrl.trans_size = registers.hwpe_params[12];
   assign sink_stream_ctrl_o.addressgen_ctrl.line_stride = registers.hwpe_params[9][31:16];
