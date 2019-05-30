@@ -37,7 +37,7 @@ module hwpe_top_wrap
 );
 
   hwpe_stream_intf_tcdm
-    tcdm[`HWPE_NB_TCDM_PORTS] ( clk );
+    tcdm[`HWPE_NB_TCDM_PORTS-1:0] ( clk );
   
   hwpe_ctrl_intf_periph #( DATA_WIDTH )
     periph ( clk );
