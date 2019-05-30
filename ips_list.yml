@@ -1,0 +1,7 @@
+hwpe-ctrl:
+  commit: master
+  group: lukamac
+hwpe-stream:
+  commit: master
+  group: lukamac
+

@@ -1,0 +1,22 @@
+hwpe-stream:
+  vlog_opts: [
+    +nowarnSVCHK,
+  ]
+  incdirs: [
+    rtl,
+  ]
+  files: [
+    rtl/control.sv,
+    rtl/streamer.sv,
+    rtl/top.sv,
+    rtl/top_wrap.sv,
+  ]
+
+tb_hwpe_stream:
+  flags: [
+    skip_synthesis,
+    skip_verilator,
+  ]
+  files: [
+    tb/hwpe_test_tb.sv,
+  ]
