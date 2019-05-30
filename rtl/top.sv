@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
-`define NB_OPERANDS 2
-`define NB_RESULTS 1
-`define NB_TCDM_PORTS (`NB_OPERANDS + `NB_RESULTS)
+`define HWPE_NB_OPERANDS 2
+`define HWPE_NB_RESULTS 1
+`define HWPE_NB_TCDM_PORTS (`HWPE_NB_OPERANDS + `HWPE_NB_RESULTS)
 
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
@@ -19,7 +19,7 @@ module hwpe_top
 
   output logic [N_CORES-1:0][REGFILE_N_EVT-1:0] evt,
   
-  hwpe_stream_intf_tcdm.master  tcdm[`NB_TCDM_PORTS-1:0],
+  hwpe_stream_intf_tcdm.master  tcdm[`HWPE_NB_TCDM_PORTS-1:0],
 
   hwpe_ctrl_intf_periph.slave   slave_config_interface
 );
@@ -28,8 +28,8 @@ module hwpe_top
 //                SIGNALS AND INTERFACES                //
 //======================================================//
   logic clear;
-  flags_sourcesink_t source_stream_flags[`NB_OPERANDS];
-  ctrl_sourcesink_t source_stream_ctrl[`NB_OPERANDS];
+  flags_sourcesink_t source_stream_flags[`HWPE_NB_OPERANDS];
+  ctrl_sourcesink_t source_stream_ctrl[`HWPE_NB_OPERANDS];
   flags_sourcesink_t sink_stream_flags;
   ctrl_sourcesink_t sink_stream_ctrl;
   flags_slave_t control_flags;
@@ -40,7 +40,7 @@ module hwpe_top
 
   streamer #(
     .DATA_WIDTH(32),
-    .NB_OPERANDS(`NB_OPERANDS)
+    .NB_OPERANDS(`HWPE_NB_OPERANDS)
   ) streamer_inst (
     .clk_i(clk),
     .rst_ni(rst_n),
@@ -59,7 +59,7 @@ module hwpe_top
 
   control #(
     .DATA_WIDTH(32),
-    .NB_OPERANDS(`NB_OPERANDS),
+    .NB_OPERANDS(`HWPE_NB_OPERANDS),
     .ID_WIDTH(ID_WIDTH),
     .N_CORES(N_CORES),
     .N_CONTEXT(2)

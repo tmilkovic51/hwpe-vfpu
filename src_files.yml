@@ -1,4 +1,4 @@
-hwpe-stream:
+hwpe-test:
   vlog_opts: [
     +nowarnSVCHK,
   ]
@@ -12,10 +12,9 @@ hwpe-stream:
     rtl/top_wrap.sv,
   ]
 
-tb_hwpe_stream:
+tb_hwpe-test:
   flags: [
     skip_synthesis,
-    skip_verilator,
   ]
   files: [
     tb/hwpe_test_tb.sv,

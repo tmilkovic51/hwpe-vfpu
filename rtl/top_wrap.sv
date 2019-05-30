@@ -1,4 +1,4 @@
-`define NB_TCDM_PORTS 3
+`define HWPE_NB_TCDM_PORTS 3
 
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
@@ -15,14 +15,14 @@ module hwpe_top_wrap
 
   output logic [N_CORES-1:0][REGFILE_N_EVT-1:0] evt,
   
-  output logic [`NB_TCDM_PORTS-1:0]       tcdm_req,
-  input  logic [`NB_TCDM_PORTS-1:0]       tcdm_gnt,
-  output logic [`NB_TCDM_PORTS-1:0][31:0] tcdm_add,
-  output logic [`NB_TCDM_PORTS-1:0]       tcdm_wen,
-  output logic [`NB_TCDM_PORTS-1:0][3:0]  tcdm_be,
-  output logic [`NB_TCDM_PORTS-1:0][31:0] tcdm_data,
-  input  logic [`NB_TCDM_PORTS-1:0][31:0] tcdm_r_data,
-  input  logic [`NB_TCDM_PORTS-1:0]       tcdm_r_valid,
+  output logic [`HWPE_NB_TCDM_PORTS-1:0]       tcdm_req,
+  input  logic [`HWPE_NB_TCDM_PORTS-1:0]       tcdm_gnt,
+  output logic [`HWPE_NB_TCDM_PORTS-1:0][31:0] tcdm_add,
+  output logic [`HWPE_NB_TCDM_PORTS-1:0]       tcdm_wen,
+  output logic [`HWPE_NB_TCDM_PORTS-1:0][3:0]  tcdm_be,
+  output logic [`HWPE_NB_TCDM_PORTS-1:0][31:0] tcdm_data,
+  input  logic [`HWPE_NB_TCDM_PORTS-1:0][31:0] tcdm_r_data,
+  input  logic [`HWPE_NB_TCDM_PORTS-1:0]       tcdm_r_valid,
 
   input  logic                periph_req,
   output logic                periph_gnt,
@@ -37,13 +37,13 @@ module hwpe_top_wrap
 );
 
   hwpe_stream_intf_tcdm
-    tcdm[`NB_TCDM_PORTS] ( clk );
+    tcdm[`HWPE_NB_TCDM_PORTS] ( clk );
   
   hwpe_ctrl_intf_periph #( DATA_WIDTH )
     periph ( clk );
 
   genvar i;
-  for (i = 0; i < `NB_TCDM_PORTS; i++) begin
+  for (i = 0; i < `HWPE_NB_TCDM_PORTS; i++) begin
       assign tcdm_req[i] = tcdm[i].req;
       assign tcdm_add[i] = tcdm[i].add;
       assign tcdm_wen[i] = tcdm[i].wen;
