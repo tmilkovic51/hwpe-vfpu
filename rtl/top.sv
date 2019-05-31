@@ -1,8 +1,16 @@
 `timescale 1ns / 1ps
 
+`ifndef HWPE_NB_OPERANDS
 `define HWPE_NB_OPERANDS 2
+`endif
+
+`ifndef HWPE_NB_RESULTS
 `define HWPE_NB_RESULTS 1
+`endif
+
+`ifndef HWPE_NB_TCDM_PORTS
 `define HWPE_NB_TCDM_PORTS (`HWPE_NB_OPERANDS + `HWPE_NB_RESULTS)
+`endif
 
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;

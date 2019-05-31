@@ -1,4 +1,6 @@
-`define HWPE_NB_TCDM_PORTS 3
+`define HWPE_NB_OPERANDS 2
+`define HWPE_NB_RESULTS 1
+`define HWPE_NB_TCDM_PORTS (`HWPE_NB_OPERANDS + `HWPE_NB_RESULTS)
 
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
@@ -37,7 +39,7 @@ module hwpe_top_wrap
 );
 
   hwpe_stream_intf_tcdm
-    tcdm[`HWPE_NB_TCDM_PORTS-1:0] ( clk );
+    tcdm[`HWPE_NB_TCDM_PORTS] ( clk );
   
   hwpe_ctrl_intf_periph #( DATA_WIDTH )
     periph ( clk );
