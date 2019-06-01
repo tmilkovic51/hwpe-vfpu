@@ -152,8 +152,9 @@ module streamer
 //                ADDER LOGIC                           //
 //======================================================//
 
+assign operands_fenced[0].ready = result.ready;
+assign operands_fenced[1].ready = result.ready;
 assign result.valid = operands_fenced[0].valid & operands_fenced[1].valid;
-assign result.ready = operands_fenced[0].ready & operands_fenced[1].ready;
 assign result.data = operands_fenced[0].data + operands_fenced[1].data;
 assign result.strb = operands_fenced[0].strb & operands_fenced[1].strb;
 
