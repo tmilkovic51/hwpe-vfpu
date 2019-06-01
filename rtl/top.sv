@@ -27,7 +27,7 @@ module hwpe_top
 
   output logic [N_CORES-1:0][REGFILE_N_EVT-1:0] evt,
   
-  hwpe_stream_intf_tcdm.master  tcdm[`HWPE_NB_TCDM_PORTS-1:0],
+  hwpe_stream_intf_tcdm.master  tcdm[`HWPE_NB_TCDM_PORTS],
 
   hwpe_ctrl_intf_periph.slave   slave_config_interface
 );
@@ -47,14 +47,14 @@ module hwpe_top
 //======================================================//
 
   streamer #(
-    .DATA_WIDTH(32),
+    .DATA_WIDTH(DATA_WIDTH),
     .NB_OPERANDS(`HWPE_NB_OPERANDS)
   ) streamer_inst (
     .clk_i(clk),
     .rst_ni(rst_n),
     .clear_i(clear),
     
-    .tcdm_master_load(tcdm[1:0]),
+    .tcdm_master_load(tcdm[0:1]),
     .tcdm_master_store(tcdm[2]),
     
     .load_fifo_flags_o(),
@@ -66,7 +66,7 @@ module hwpe_top
   );
 
   control #(
-    .DATA_WIDTH(32),
+    .DATA_WIDTH(DATA_WIDTH),
     .NB_OPERANDS(`HWPE_NB_OPERANDS),
     .ID_WIDTH(ID_WIDTH),
     .N_CORES(N_CORES),

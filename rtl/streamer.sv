@@ -34,11 +34,11 @@ module streamer
   
   logic stream_source_fifo_ready[NB_OPERANDS];
   
-  hwpe_stream_intf_tcdm tcdm_internal_source[NB_OPERANDS][0:0] (
+  hwpe_stream_intf_tcdm tcdm_internal_source[NB_OPERANDS][1] (
     .clk ( clk_i )
   );
   
-  hwpe_stream_intf_tcdm tcdm_internal_sink[0:0] (
+  hwpe_stream_intf_tcdm tcdm_internal_sink[1] (
     .clk ( clk_i )
   );
   
@@ -152,9 +152,9 @@ module streamer
 //                ADDER LOGIC                           //
 //======================================================//
 
-assign result.valid = operands_fenced[0].valid;
-assign result.ready = operands_fenced[0].ready;
+assign result.valid = operands_fenced[0].valid & operands_fenced[1].valid;
+assign result.ready = operands_fenced[0].ready & operands_fenced[1].ready;
 assign result.data = operands_fenced[0].data + operands_fenced[1].data;
-assign result.strb = operands_fenced[0].strb;
+assign result.strb = operands_fenced[0].strb & operands_fenced[1].strb;
 
 endmodule
