@@ -2,6 +2,7 @@
 
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
+import hwpe_ctrl_registers_package::*;
 
 module control
 #(
@@ -74,38 +75,38 @@ module control
   assign sink_stream_ctrl_o.req_start = ctrl_flags_o.start;
   
   // OPERAND A ADDRESGEN CONTROL
-  assign source_stream_ctrl_o[0].addressgen_ctrl.base_addr = registers.hwpe_params[0];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.trans_size = registers.hwpe_params[12];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.line_stride = registers.hwpe_params[1][31:16];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.line_length = registers.hwpe_params[1][15:0];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.feat_stride = registers.hwpe_params[2][31:16];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.feat_length = registers.hwpe_params[2][15:0];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.loop_outer = registers.hwpe_params[3][16];
-  assign source_stream_ctrl_o[0].addressgen_ctrl.feat_roll = registers.hwpe_params[3][15:0];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.base_addr = registers.hwpe_params[BASE_ADDR_A_REG_INDEX];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.trans_size = registers.hwpe_params[TRANSACTION_SIZE_REG_INDEX];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.line_stride = registers.hwpe_params[LINE_STRIDE_A_REG_INDEX][31:16];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.line_length = registers.hwpe_params[LINE_LENGTH_A_REG_INDEX][15:0];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.feat_stride = registers.hwpe_params[FEAT_STRIDE_A_REG_INDEX][31:16];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.feat_length = registers.hwpe_params[FEAT_LENGTH_A_REG_INDEX][15:0];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.loop_outer = registers.hwpe_params[LOOP_OUTER_A_REG_INDEX][16];
+  assign source_stream_ctrl_o[0].addressgen_ctrl.feat_roll = registers.hwpe_params[FEAT_ROLL_A_REG_INDEX][15:0];
   assign source_stream_ctrl_o[0].addressgen_ctrl.realign_type = 0;
   assign source_stream_ctrl_o[0].addressgen_ctrl.line_length_remainder = 0;
   
   // OPERAND B ADDRESGEN CONTROL
-  assign source_stream_ctrl_o[1].addressgen_ctrl.base_addr = registers.hwpe_params[4];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.trans_size = registers.hwpe_params[12];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.line_stride = registers.hwpe_params[5][31:16];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.line_length = registers.hwpe_params[5][15:0];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.feat_stride = registers.hwpe_params[6][31:16];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.feat_length = registers.hwpe_params[6][15:0];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.loop_outer = registers.hwpe_params[7][16];
-  assign source_stream_ctrl_o[1].addressgen_ctrl.feat_roll = registers.hwpe_params[7][15:0];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.base_addr = registers.hwpe_params[BASE_ADDR_B_REG_INDEX];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.trans_size = registers.hwpe_params[TRANSACTION_SIZE_REG_INDEX];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.line_stride = registers.hwpe_params[LINE_STRIDE_B_REG_INDEX][31:16];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.line_length = registers.hwpe_params[LINE_LENGTH_B_REG_INDEX][15:0];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.feat_stride = registers.hwpe_params[FEAT_STRIDE_B_REG_INDEX][31:16];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.feat_length = registers.hwpe_params[FEAT_LENGTH_B_REG_INDEX][15:0];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.loop_outer = registers.hwpe_params[LOOP_OUTER_B_REG_INDEX][16];
+  assign source_stream_ctrl_o[1].addressgen_ctrl.feat_roll = registers.hwpe_params[FEAT_ROLL_B_REG_INDEX][15:0];
   assign source_stream_ctrl_o[1].addressgen_ctrl.realign_type = 0;
   assign source_stream_ctrl_o[1].addressgen_ctrl.line_length_remainder = 0;
   
   // RESULT ADDRESGEN CONTROL
-  assign sink_stream_ctrl_o.addressgen_ctrl.base_addr = registers.hwpe_params[8];
-  assign sink_stream_ctrl_o.addressgen_ctrl.trans_size = registers.hwpe_params[12];
-  assign sink_stream_ctrl_o.addressgen_ctrl.line_stride = registers.hwpe_params[9][31:16];
-  assign sink_stream_ctrl_o.addressgen_ctrl.line_length = registers.hwpe_params[9][15:0];
-  assign sink_stream_ctrl_o.addressgen_ctrl.feat_stride = registers.hwpe_params[10][31:16];
-  assign sink_stream_ctrl_o.addressgen_ctrl.feat_length = registers.hwpe_params[10][15:0];
-  assign sink_stream_ctrl_o.addressgen_ctrl.loop_outer = registers.hwpe_params[11][16];
-  assign sink_stream_ctrl_o.addressgen_ctrl.feat_roll = registers.hwpe_params[11][15:0];
+  assign sink_stream_ctrl_o.addressgen_ctrl.base_addr = registers.hwpe_params[BASE_ADDR_RESULT_REG_INDEX];
+  assign sink_stream_ctrl_o.addressgen_ctrl.trans_size = registers.hwpe_params[TRANSACTION_SIZE_REG_INDEX];
+  assign sink_stream_ctrl_o.addressgen_ctrl.line_stride = registers.hwpe_params[LINE_STRIDE_RESULT_REG_INDEX][31:16];
+  assign sink_stream_ctrl_o.addressgen_ctrl.line_length = registers.hwpe_params[LINE_LENGTH_RESULT_REG_INDEX][15:0];
+  assign sink_stream_ctrl_o.addressgen_ctrl.feat_stride = registers.hwpe_params[FEAT_STRIDE_RESULT_REG_INDEX][31:16];
+  assign sink_stream_ctrl_o.addressgen_ctrl.feat_length = registers.hwpe_params[FEAT_LENGTH_RESULT_REG_INDEX][15:0];
+  assign sink_stream_ctrl_o.addressgen_ctrl.loop_outer = registers.hwpe_params[LOOP_OUTER_RESULT_REG_INDEX][16];
+  assign sink_stream_ctrl_o.addressgen_ctrl.feat_roll = registers.hwpe_params[FEAT_ROLL_RESULT_REG_INDEX][15:0];
   assign sink_stream_ctrl_o.addressgen_ctrl.realign_type = 0;
   assign sink_stream_ctrl_o.addressgen_ctrl.line_length_remainder = 0;
 
