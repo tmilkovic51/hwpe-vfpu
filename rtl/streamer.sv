@@ -13,6 +13,7 @@ module streamer
   input  logic                  clk_i,
   input  logic                  rst_ni,
   input  logic                  clear_i,
+  input  logic                  operation_i,
   
   hwpe_stream_intf_tcdm.master  tcdm_master_load[NB_OPERANDS],
   hwpe_stream_intf_tcdm.master  tcdm_master_store,
@@ -155,7 +156,7 @@ module streamer
 assign operands_fenced[0].ready = result.ready;
 assign operands_fenced[1].ready = result.ready;
 assign result.valid = operands_fenced[0].valid & operands_fenced[1].valid;
-assign result.data = operands_fenced[0].data + operands_fenced[1].data;
+assign result.data = (operation_i == 0) ? operands_fenced[0].data + operands_fenced[1].data : operands_fenced[0].data - operands_fenced[1].data;
 assign result.strb = operands_fenced[0].strb & operands_fenced[1].strb;
 
 endmodule

@@ -16,6 +16,7 @@ module control
   input  logic                  clk_i,
   input  logic                  rst_ni,
   output logic                  clear_o,
+  output logic                  operation_o,
   
   // source stream control and flags
   output ctrl_sourcesink_t     source_stream_ctrl_o[NB_OPERANDS],
@@ -109,5 +110,7 @@ module control
   assign sink_stream_ctrl_o.addressgen_ctrl.feat_roll = registers.hwpe_params[FEAT_ROLL_RESULT_REG_INDEX][15:0];
   assign sink_stream_ctrl_o.addressgen_ctrl.realign_type = 0;
   assign sink_stream_ctrl_o.addressgen_ctrl.line_length_remainder = 0;
+
+  assign operation_o = registers.hwpe_params[OPERATION_SELECT_REG_INDEX][0];
 
 endmodule

@@ -36,6 +36,7 @@ module hwpe_top
 //                SIGNALS AND INTERFACES                //
 //======================================================//
   logic clear;
+  logic operation;
   flags_sourcesink_t source_stream_flags[`HWPE_NB_OPERANDS];
   ctrl_sourcesink_t source_stream_ctrl[`HWPE_NB_OPERANDS];
   flags_sourcesink_t sink_stream_flags;
@@ -53,6 +54,7 @@ module hwpe_top
     .clk_i(clk),
     .rst_ni(rst_n),
     .clear_i(clear),
+    .operation_i(operation),
     
     .tcdm_master_load(tcdm[0:1]),
     .tcdm_master_store(tcdm[2]),
@@ -75,6 +77,7 @@ module hwpe_top
     .clk_i(clk),
     .rst_ni(rst_n),
     .clear_o(clear),
+    .operation_o(operation),
     
     .source_stream_ctrl_o(source_stream_ctrl),
     .source_stream_flags_i(source_stream_flags),
