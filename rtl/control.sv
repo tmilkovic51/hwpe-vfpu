@@ -16,7 +16,6 @@ module control
   input  logic                  clk_i,
   input  logic                  rst_ni,
   output logic                  clear_o,
-  output logic                  operation_o,
   
   // source stream control and flags
   output ctrl_sourcesink_t     source_stream_ctrl_o[NB_OPERANDS],
@@ -28,6 +27,9 @@ module control
   
   // control module flags
   output flags_slave_t          ctrl_flags_o,
+  
+  // VPFU control signals
+  output vfpu_ctrl_t            vfpu_ctrl_o,
   
   // HWPE configuration interface on peripheral bus
   hwpe_ctrl_intf_periph.slave   slave_config_interface
@@ -111,6 +113,8 @@ module control
   assign sink_stream_ctrl_o.addressgen_ctrl.realign_type = 0;
   assign sink_stream_ctrl_o.addressgen_ctrl.line_length_remainder = 0;
 
-  assign operation_o = registers.hwpe_params[OPERATION_SELECT_REG_INDEX][0];
+  // VFPU control signals
+  assign vfpu_ctrl_o.operation = registers.hwpe_params[OPERATION_SELECT_REG_INDEX][OPERATION_SELECT_WIDTH-1:0];
+  assign vfpu_ctrl_o.rounding_mode = registers.hwpe_params[ROUNDING_MODE_SELECT_REG_INDEX][16+ROUNDING_MODE_SELECT_WIDTH-1:16];
 
 endmodule

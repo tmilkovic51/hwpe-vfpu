@@ -30,5 +30,19 @@ package hwpe_ctrl_registers_package;
   // COMMON CONTROL REGISTER INDICES
   parameter int unsigned TRANSACTION_SIZE_REG_INDEX         = 12;
   parameter int unsigned OPERATION_SELECT_REG_INDEX         = 13;
+  parameter int unsigned ROUNDING_MODE_SELECT_REG_INDEX     = 13;
+  
+  // SIGNAL WIDTHS IN BITS
+  parameter int unsigned OPERATION_SELECT_WIDTH             = 3;
+  parameter int unsigned ROUNDING_MODE_SELECT_WIDTH         = 2;
+  
+  // VFPU control signals structure
+  typedef struct packed {
+    logic [OPERATION_SELECT_WIDTH-1:0]      operation;
+    logic [ROUNDING_MODE_SELECT_WIDTH-1:0]  rounding_mode;
+  } vfpu_ctrl_t;
+  
+
+
 
 endpackage // hwpe_ctrl_registers_package
