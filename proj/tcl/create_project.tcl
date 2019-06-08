@@ -1,4 +1,4 @@
-create_project simulation .
+create_project hwpe-vfpu .
 set_property part xc7z020clg484-1 [current_project]
 # set_property board_part em.avnet.com:zed:part0:1.4 [current_project]
 add_files -scan_for_includes -fileset sources_1 { .. }

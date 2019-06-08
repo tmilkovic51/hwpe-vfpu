@@ -8,8 +8,8 @@ hwpe-test:
   files: [
     rtl/control.sv,
     rtl/streamer.sv,
-    rtl/top.sv,
-    rtl/top_wrap.sv,
+    rtl/hwpe_top.sv,
+    rtl/hwpe_top_wrap.sv,
   ]
 
 tb_hwpe-test:

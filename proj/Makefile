@@ -2,7 +2,7 @@ create_project:
 	vivado -mode batch -source tcl/create_project.tcl -nojournal -nolog
 
 clean:
-	rm -rf .Xil simulation.cache simulation.hw simulation.ip_user_files simulation.sim simulation.xpr simulation.runs vivado.*
+	rm -rf .Xil hwpe-vfpu.cache hwpe-vfpu.hw hwpe-vfpu.ip_user_files hwpe-vfpu.sim hwpe-vfpu.xpr hwpe-vfpu.runs vivado.*
 
 gui:
-	vivado simulation.xpr -nolog -nojournal
+	vivado hwpe-vfpu.xpr -nolog -nojournal
