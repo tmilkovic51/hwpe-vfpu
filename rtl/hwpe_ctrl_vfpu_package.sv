@@ -1,7 +1,7 @@
 package hwpe_ctrl_vfpu_package;
 
 //======================================================//
-//                    PARAMETERS                        //
+//         CONFIGURATION REGISTERS PARAMETERS           //
 //======================================================//
 
   // OPERAND A CONTROL REGISTERS INDICES
@@ -42,6 +42,28 @@ package hwpe_ctrl_vfpu_package;
   
   
 //======================================================//
+//           FLOATING POINT FRAGMENTS WIDTHS            //
+//======================================================//
+  parameter int unsigned FP_WIDTH               = 32;
+
+  parameter int unsigned FP_SIGN_WIDTH          = 1;
+  parameter int unsigned FP_EXP_WIDTH           = 8;
+  parameter int unsigned FP_MAN_WIDTH           = 23;
+  
+  
+//======================================================//
+//              FLOATING POINT CONSTANTS                //
+//======================================================//
+  // Exponent bias
+  parameter EXP_BIAS            = 10'd127;
+  
+  // Special values
+  parameter QNAN                = 32'hFFC00001;
+  parameter SNAN                = 32'hFF800001;
+  parameter MINUS_INFINITY      = 32'hFF800000;
+  parameter PLUS_INFINITY       = 32'h7F800000;
+  
+//======================================================//
 //                   TYPE DEFINITIONS                   //
 //======================================================//
 
@@ -60,5 +82,12 @@ package hwpe_ctrl_vfpu_package;
     logic               plusInfinity;
     logic               minusInfinity;
   } flags_vfpu_t;
+  
+  // floating point number format
+  typedef struct packed {
+    logic                       sign;
+    logic [FP_EXP_WIDTH-1:0]    exponent;
+    logic [FP_MAN_WIDTH-1:0]    mantissa;
+  } fp_t;
 
 endpackage // hwpe_ctrl_vfpu_package
