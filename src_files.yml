@@ -7,7 +7,9 @@ hwpe-test:
   ]
   files: [
     rtl/control.sv,
-    rtl/streamer.sv,
+    rtl/streamer_source.sv,
+    rtl/streamer_vfpu.sv,
+    rtl/streamer_sink.sv,
     rtl/hwpe_top.sv,
     rtl/hwpe_top_wrap.sv,
   ]

@@ -12,10 +12,10 @@ module hwpe_top_wrap
   parameter int unsigned DATA_WIDTH = 32
 )
 (
-  input  logic                  clk,
-  input  logic                  rst_n,
+  input  logic                  clk_i,
+  input  logic                  rst_ni,
 
-  output logic [N_CORES-1:0][REGFILE_N_EVT-1:0] evt,
+  output logic [N_CORES-1:0][REGFILE_N_EVT-1:0] evt_o,
   
   output logic [`HWPE_NB_TCDM_PORTS-1:0]       tcdm_req,
   input  logic [`HWPE_NB_TCDM_PORTS-1:0]       tcdm_gnt,
@@ -39,10 +39,10 @@ module hwpe_top_wrap
 );
 
   hwpe_stream_intf_tcdm
-    tcdm[`HWPE_NB_TCDM_PORTS] ( clk );
+    tcdm[`HWPE_NB_TCDM_PORTS] (clk_i);
   
   hwpe_ctrl_intf_periph #( DATA_WIDTH )
-    periph ( clk );
+    periph (clk_i);
 
   genvar i;
   for (i = 0; i < `HWPE_NB_TCDM_PORTS; i++) begin
@@ -72,9 +72,9 @@ module hwpe_top_wrap
     .ID_WIDTH(ID_WIDTH),
     .DATA_WIDTH(DATA_WIDTH)
   ) hwpe_top_inst (
-    .clk(clk),
-    .rst_n(rst_n),
-    .evt(evt),
+    .clk_i(clk_i),
+    .rst_ni(rst_ni),
+    .evt_o(evt_o),
     .tcdm(tcdm),
     .slave_config_interface(periph)
   );

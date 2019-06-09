@@ -2,7 +2,7 @@
 
 import hwpe_stream_package::*;
 import hwpe_ctrl_package::*;
-import hwpe_ctrl_registers_package::*;
+import hwpe_ctrl_vfpu_package::*;
 
 module control
 #(
@@ -29,7 +29,7 @@ module control
   output flags_slave_t          ctrl_flags_o,
   
   // VPFU control signals
-  output vfpu_ctrl_t            vfpu_ctrl_o,
+  output ctrl_vfpu_t            ctrl_vfpu_o,
   
   // HWPE configuration interface on peripheral bus
   hwpe_ctrl_intf_periph.slave   slave_config_interface
@@ -114,7 +114,7 @@ module control
   assign sink_stream_ctrl_o.addressgen_ctrl.line_length_remainder = 0;
 
   // VFPU control signals
-  assign vfpu_ctrl_o.operation = registers.hwpe_params[OPERATION_SELECT_REG_INDEX][OPERATION_SELECT_WIDTH-1:0];
-  assign vfpu_ctrl_o.rounding_mode = registers.hwpe_params[ROUNDING_MODE_SELECT_REG_INDEX][16+ROUNDING_MODE_SELECT_WIDTH-1:16];
+  assign ctrl_vfpu_o.operation = registers.hwpe_params[OPERATION_SELECT_REG_INDEX][OPERATION_SELECT_WIDTH-1:0];
+  assign ctrl_vfpu_o.rounding_mode = registers.hwpe_params[ROUNDING_MODE_SELECT_REG_INDEX][16+ROUNDING_MODE_SELECT_WIDTH-1:16];
 
 endmodule

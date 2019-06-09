@@ -1,4 +1,8 @@
-package hwpe_ctrl_registers_package;
+package hwpe_ctrl_vfpu_package;
+
+//======================================================//
+//                    PARAMETERS                        //
+//======================================================//
 
   // OPERAND A CONTROL REGISTERS INDICES
   parameter int unsigned BASE_ADDR_A_REG_INDEX              = 0;
@@ -36,13 +40,25 @@ package hwpe_ctrl_registers_package;
   parameter int unsigned OPERATION_SELECT_WIDTH             = 3;
   parameter int unsigned ROUNDING_MODE_SELECT_WIDTH         = 2;
   
+  
+//======================================================//
+//                   TYPE DEFINITIONS                   //
+//======================================================//
+
   // VFPU control signals structure
   typedef struct packed {
     logic [OPERATION_SELECT_WIDTH-1:0]      operation;
     logic [ROUNDING_MODE_SELECT_WIDTH-1:0]  rounding_mode;
-  } vfpu_ctrl_t;
+  } ctrl_vfpu_t;
   
+  // VFPU flags structure
+  typedef struct packed {
+    logic               underflow;
+    logic               overflow;
+    logic               inexact;
+    logic               zero;
+    logic               plusInfinity;
+    logic               minusInfinity;
+  } flags_vfpu_t;
 
-
-
-endpackage // hwpe_ctrl_registers_package
+endpackage // hwpe_ctrl_vfpu_package
