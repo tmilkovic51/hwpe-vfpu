@@ -138,16 +138,16 @@ logic                                       signPreNorm;
 logic signed [FP_EXP_PRENORM_WIDTH-1:0]     exponentPreNorm;
 logic [FP_MANT_PRENORM_WIDTH-1:0]           mantissaPreNorm;
 
+// result components before normalization (registered)
+logic                                       signPreNorm_reg;
+logic signed [FP_EXP_PRENORM_WIDTH-1:0]     exponentPreNorm_reg;
+logic [FP_MANT_PRENORM_WIDTH-1:0]           mantissaPreNorm_reg;
+logic                                       normOperandReady_reg;
+
 // result components after normalization
 logic                                       signPostNorm;
 logic [FP_EXP_WIDTH-1:0]                    exponentPostNorm;
 logic [FP_MANT_WIDTH-1+1:0]                 mantissaPostNorm; // +1 because of hidden one
-
-// result components after normalization (registered)
-logic                                       signPostNorm_reg;
-logic [FP_EXP_WIDTH-1:0]                    exponentPostNorm_reg;
-logic [FP_MANT_WIDTH-1+1:0]                 mantissaPostNorm_reg; // +1 because of hidden one
-logic                                       normOperandReady_reg;
 
 // flags
 logic                                       normOperandReady;
