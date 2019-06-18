@@ -33,10 +33,10 @@ logic                       signA;
 logic                       signB;
 logic [FP_EXP_WIDTH-1:0]    exponentA;
 logic [FP_EXP_WIDTH-1:0]    exponentB;
-logic                       hiddenOneA;
-logic                       hiddenOneB;
-logic [FP_MANT_WIDTH-1+1:0] mantissaA; // +1 because of hidden one bit
-logic [FP_MANT_WIDTH-1+1:0] mantissaB; // +1 because of hidden one bit
+logic                       impliedBitA;
+logic                       impliedBitB;
+logic [FP_MANT_WIDTH-1+1:0] mantissaA; // +1 because of concatenation with implied bit
+logic [FP_MANT_WIDTH-1+1:0] mantissaB; // +1 because of concatenation with implied bit
 
 // output result
 fp_t result;
@@ -67,10 +67,10 @@ assign signA = operandA_reg.sign;
 assign signB = (ctrl_vfpu_i.operation == FP_OP_SUB) ? ~operandB_reg.sign : operandB_reg.sign; // invert sign of B operand if operation is subtraction
 assign exponentA  = operandA_reg.exponent;
 assign exponentB  = operandB_reg.exponent;
-assign hiddenOneA = | operandA_reg.exponent; // calculate hidden one bit
-assign hiddenOneB = | operandB_reg.exponent;
-assign mantissaA = {hiddenOneA, operandA_reg.mantissa}; // concatenate hidden one bit with mantissa
-assign mantissaB = {hiddenOneB, operandB_reg.mantissa};
+assign impliedBitA = | operandA_reg.exponent; // calculate implied bit
+assign impliedBitB = | operandB_reg.exponent;
+assign mantissaA = {impliedBitA, operandA_reg.mantissa}; // concatenate implied bit with mantissa
+assign mantissaB = {impliedBitB, operandB_reg.mantissa};
 
 //======================================================//
 //                        FP ADDER                      //
@@ -143,6 +143,12 @@ logic                                       signPostNorm;
 logic [FP_EXP_WIDTH-1:0]                    exponentPostNorm;
 logic [FP_MANT_WIDTH-1+1:0]                 mantissaPostNorm; // +1 because of hidden one
 
+// result components after normalization (registered)
+logic                                       signPostNorm_reg;
+logic [FP_EXP_WIDTH-1:0]                    exponentPostNorm_reg;
+logic [FP_MANT_WIDTH-1+1:0]                 mantissaPostNorm_reg; // +1 because of hidden one
+logic                                       normOperandReady_reg;
+
 // flags
 logic                                       normOperandReady;
 logic                                       normDone;
@@ -172,6 +178,23 @@ always_comb
     endcase // case (ctrl_vfpu_i.operation)
 end // always_comb begin
 
+// latch normalizer operand and valid signal
+always_ff @(posedge clk_i, negedge rst_ni)
+  begin
+    if (rst_ni == 1'b0) begin
+      signPreNorm_reg       <= '0;
+      exponentPreNorm_reg   <= '0;
+      mantissaPreNorm_reg   <= '0;
+      normOperandReady_reg  <= '0;
+    end
+    else begin
+      signPreNorm_reg       <= signPreNorm;
+      exponentPreNorm_reg   <= exponentPreNorm;
+      mantissaPreNorm_reg   <= mantissaPreNorm;
+      normOperandReady_reg  <= normOperandReady;
+   end
+end
+
 // normalizer instantiation
 vfpu_norm normalizer (
   .clk_i(clk_i),
@@ -180,16 +203,16 @@ vfpu_norm normalizer (
   .ctrl_vfpu_i(ctrl_vfpu_i),
   
   // operand
-  .signPreNorm_i(signPreNorm),
-  .exponentPreNorm_i(exponentPreNorm),
-  .mantissaPreNorm_i(mantissaPreNorm),
+  .signPreNorm_i(signPreNorm_reg),
+  .exponentPreNorm_i(exponentPreNorm_reg),
+  .mantissaPreNorm_i(mantissaPreNorm_reg),
   
   // result
   .signPostNorm_o(signPostNorm),
   .exponentPostNorm_o(exponentPostNorm),
   .mantissaPostNorm_o(mantissaPostNorm),
   
-  .operandReady_i(normOperandReady),
+  .operandReady_i(normOperandReady_reg),
   .done_o(normDone)
 );
 
