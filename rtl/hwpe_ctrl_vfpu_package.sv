@@ -37,7 +37,7 @@ package hwpe_ctrl_vfpu_package;
   parameter int unsigned ROUNDING_MODE_SELECT_REG_INDEX     = 13;
   
   // SIGNAL WIDTHS IN BITS
-  parameter int unsigned OPERATION_SELECT_WIDTH             = 3;
+  parameter int unsigned OPERATION_SELECT_WIDTH             = 2;
   parameter int unsigned ROUNDING_MODE_SELECT_WIDTH         = 2;
   
   
@@ -48,8 +48,10 @@ package hwpe_ctrl_vfpu_package;
 
   parameter int unsigned FP_SIGN_WIDTH          = 1;
   parameter int unsigned FP_EXP_WIDTH           = 8;
-  parameter int unsigned FP_MAN_WIDTH           = 23;
+  parameter int unsigned FP_MANT_WIDTH          = 23;
   
+  parameter int unsigned FP_EXP_PRENORM_WIDTH   = FP_EXP_WIDTH+2; // +1 because of multiplication (exponents are added) + 1 to preserve sign
+  parameter int unsigned FP_MANT_PRENORM_WIDTH  = FP_MANT_WIDTH*2+2; // *2 because of multiplication + 2 for hidden one bit
   
 //======================================================//
 //              FLOATING POINT CONSTANTS                //
@@ -62,6 +64,21 @@ package hwpe_ctrl_vfpu_package;
   parameter SNAN                = 32'hFF800001;
   parameter MINUS_INFINITY      = 32'hFF800000;
   parameter PLUS_INFINITY       = 32'h7F800000;
+  
+//======================================================//
+//                       OPERATIONS                     //
+//======================================================//
+  parameter FP_OP_ADD      = 2'b00;
+  parameter FP_OP_SUB      = 2'b01;
+  parameter FP_OP_MUL      = 2'b10;
+  
+//======================================================//
+//                   ROUNDING MODES                     //
+//======================================================//
+  parameter FP_RM_TRUNCATE      = 2'b00;
+  parameter FP_RM_NEAREST       = 2'b01;
+  parameter FP_RM_PLUS_INF      = 2'b10;
+  parameter FP_RM_MINUS_INF     = 2'b11;
   
 //======================================================//
 //                   TYPE DEFINITIONS                   //
@@ -87,7 +104,7 @@ package hwpe_ctrl_vfpu_package;
   typedef struct packed {
     logic                       sign;
     logic [FP_EXP_WIDTH-1:0]    exponent;
-    logic [FP_MAN_WIDTH-1:0]    mantissa;
+    logic [FP_MANT_WIDTH-1:0]   mantissa;
   } fp_t;
 
 endpackage // hwpe_ctrl_vfpu_package

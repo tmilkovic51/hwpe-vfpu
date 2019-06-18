@@ -96,7 +96,7 @@ module hwpe_top
   streamer_vfpu #(
     .DATA_WIDTH(DATA_WIDTH),
     .NB_OPERANDS(`HWPE_NB_OPERANDS)
-  ) streamer_inst (
+  ) streamer_vfpu_inst (
     .clk_i(clk_i),
     .rst_ni(rst_ni),
     .clear_i(clear),

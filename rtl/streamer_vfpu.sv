@@ -22,7 +22,7 @@ module streamer_vfpu
   
   // VFPU control and flags
   input  ctrl_vfpu_t                ctrl_vfpu_i,
-  input  flags_vfpu_t               flags_vfpu_o
+  output flags_vfpu_t               flags_vfpu_o
 );
 
 //======================================================//
@@ -41,7 +41,7 @@ module streamer_vfpu
 //                    INSTANTIATIONS                    //
 //======================================================//
 
-  vfpu (
+  vfpu vfpu_engine (
     .clk_i(clk_i),
     .rst_ni(rst_ni),
     

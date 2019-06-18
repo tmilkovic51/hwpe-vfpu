@@ -6,29 +6,35 @@ import hwpe_ctrl_vfpu_package::*;
 
 module vfpu_mult
 (
-  input  logic                      clk_i,
-  input  logic                      rst_ni,
+  input  logic                                      clk_i,
+  input  logic                                      rst_ni,
 
-  input  fp_t                       operandA_i,
-  input  fp_t                       operandB_i,
-  output fp_t                       result_o,
+  // operands
+  input logic                                       signA_i,
+  input logic                                       signB_i,
+  input logic [FP_EXP_WIDTH-1:0]                    exponentA_i,
+  input logic [FP_EXP_WIDTH-1:0]                    exponentB_i,
+  input logic [FP_MANT_WIDTH-1+1:0]                 mantissaA_i, // +1 because of hidden one
+  input logic [FP_MANT_WIDTH-1+1:0]                 mantissaB_i, // +1 because of hidden one
+
+  // resiult
+  output logic                                      signPreNorm_o,
+  output logic signed [FP_EXP_PRENORM_WIDTH-1:0]    exponentPreNorm_o,
+  output logic [FP_MANT_PRENORM_WIDTH-1:0]          mantissaPreNorm_o,
   
-  input ctrl_vfpu_t                 ctrl_vfpu_i,
-  
-  output logic                      ready_o,
-  output logic                      done_o
+  input logic                                       operandsReady_i,
+  output logic                                      done_o
 );
 
 //======================================================//
-//                SIGNALS AND INTERFACES                //
+//                      LOGIC                           //
 //======================================================//
-
-//======================================================//
-//                    INSTANTIATIONS                    //
-//======================================================//
-
-//======================================================//
-//                ADDER LOGIC                           //
-//======================================================//
+   /////////////////////////////////////////////////////////////////////////////
+   // Output calculations                                                     //
+   /////////////////////////////////////////////////////////////////////////////
+   assign signPreNorm_o = signA_i ^ signB_i;
+   assign exponentPreNorm_o  = signed'({2'b0, exponentA_i}) + signed'({2'b0, exponentB_i}) - signed'(EXP_BIAS);
+   assign mantissaPreNorm_o = mantissaA_i * mantissaB_i;
+   assign done_o = operandsReady_i;
 
 endmodule

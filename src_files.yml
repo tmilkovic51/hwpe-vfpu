@@ -7,8 +7,14 @@ hwpe-test:
   ]
   files: [
     rtl/control.sv,
+    rtl/hwpe_ctrl_vfpu_package.sv,
     rtl/streamer_source.sv,
     rtl/streamer_vfpu.sv,
+    rtl/vfpu.sv,
+    rtl/vfpu_add.sv,
+    rtl/vfpu_mult.sv,
+    rtl/vfpu_norm.sv,
+    rtl/vfpu_lod.sv,
     rtl/streamer_sink.sv,
     rtl/hwpe_top.sv,
     rtl/hwpe_top_wrap.sv,
