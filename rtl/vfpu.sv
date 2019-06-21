@@ -201,6 +201,7 @@ vfpu_norm normalizer (
   .rst_ni(rst_ni),
   
   .ctrl_vfpu_i(ctrl_vfpu_i),
+  .flags_vfpu_o(flags_vfpu_o),
   
   // operand
   .signPreNorm_i(signPreNorm_reg),

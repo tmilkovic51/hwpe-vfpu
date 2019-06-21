@@ -53,6 +53,20 @@ package hwpe_ctrl_vfpu_package;
   parameter int unsigned FP_EXP_PRENORM_WIDTH   = FP_EXP_WIDTH+2; // +1 because of multiplication (exponents are added) + 1 to preserve sign
   parameter int unsigned FP_MANT_PRENORM_WIDTH  = FP_MANT_WIDTH*2+2; // *2 because of multiplication + 2 for hidden one bit
   
+  // ADDER
+  parameter int unsigned MANT_SHIFTIN_WIDTH     = FP_MANT_WIDTH+3;
+  parameter int unsigned MANT_SHIFTED_WIDTH     = FP_MANT_WIDTH+4;
+  
+  parameter int unsigned MANT_ADDIN_WIDTH       = FP_MANT_WIDTH+4;
+  parameter int unsigned MANT_ADDOUT_WIDTH      = FP_MANT_WIDTH+5;
+  
+  
+  
+  // NORMALIZER
+  parameter C_MANT_PRENORM_IND = 6;
+  parameter C_EXP_ZERO     = 8'h00;
+  parameter C_EXP_INF      = 8'hff;
+  
 //======================================================//
 //              FLOATING POINT CONSTANTS                //
 //======================================================//
