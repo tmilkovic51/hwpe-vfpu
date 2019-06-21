@@ -108,4 +108,4 @@ tb_dummy_memory #(
   .tcdm(load)
 );
 
-endmodule;
+endmodule

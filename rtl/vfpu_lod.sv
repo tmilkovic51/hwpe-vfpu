@@ -11,7 +11,7 @@ module vfpu_lod
 (
   input  logic [WIDTH-1:0]         in_i,
 
-  output logic [$clog2(WIDTH)-1:0] first_one_index_o,
+  output logic [$clog2(WIDTH)-1:0] first_one_o,
   output logic                     no_ones_o
 );
 
@@ -77,7 +77,7 @@ module vfpu_lod
   // connect output                                                           //
   //////////////////////////////////////////////////////////////////////////////
 
-  assign first_one_index_o = index_nodes[0];
+  assign first_one_o = index_nodes[0];
   assign no_ones_o         = ~sel_nodes[0];
   
 
