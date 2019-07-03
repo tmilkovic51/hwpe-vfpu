@@ -1,111 +1,108 @@
 `timescale 1ns / 1ps
 
+import hwpe_ctrl_vfpu_package::*;
+
 module hwpe_test_tb;
 
-logic clk=0, rst_n, clear;
-logic randomize_i;
+logic clk = 0, rst_n, clear;
 
-hwpe_stream_intf_tcdm load[0:0] (
-  .clk ( clk )
-);
-
-hwpe_stream_intf_tcdm store (
-  .clk ( clk )
-);
-
-flags_fifo_t load_fifo_flags;
-flags_fifo_t store_fifo_flags;
-
-ctrl_sourcesink_t  source_stream_ctrl;
-flags_sourcesink_t source_stream_flags;
-
-ctrl_sourcesink_t  sink_stream_ctrl;
-flags_sourcesink_t sink_stream_flags;
+// VFPU module signals
+fp_t                       operandA;
+fp_t                       operandB;
+fp_t                       result;
+  
+ctrl_vfpu_t                ctrl_vfpu;
+flags_vfpu_t               flags_vfpu;
+logic                      operands_valid;
+  
+logic                      ready;
+logic                      valid;
 
 localparam TCP = 10.0ns;
 
+// clock generator
 always
     #(TCP/2) clk = !clk;
 
 task reset();
-    #TCP rst_n <= 0;
-    #(4*TCP) rst_n <= 1;
+    rst_n <= 0;
+    #(4*TCP + TCP/2) rst_n <= 1;
 endtask
 
+logic [31:0] a;
+logic [31:0] b;
+logic [31:0] res;
+
+assign operandA.sign = a[31];
+assign operandA.exponent = a[30:23];
+assign operandA.mantissa = a[22:0];
+
+assign operandB.sign = b[31];
+assign operandB.exponent = b[30:23];
+assign operandB.mantissa = b[22:0];
+
+assign res[31] = result.sign;
+assign res[30:23] = result.exponent;
+assign res[22:0] = result.mantissa;
+
 initial begin
-    randomize_i = 1;
-    #TCP randomize_i = 0;
-    reset();
+    rst_n = 0;
+    clear = 0;
+    ctrl_vfpu.operation = FP_OP_SUB;
+    ctrl_vfpu.rounding_mode = FP_RM_NEAREST;
+    operands_valid = 1'b0;
+    
+    a = 32'h00000000; // 0.0
+    b = 32'h00000000;
+    
+    #(2*TCP);
+    
+    rst_n = 1;
+    
+    #(TCP/2);
+    operands_valid = 1'b1;
+    a = 32'h41a40000; // 20.5
+    b = 32'h408a3d71;// 4.32
+    
+    #TCP;
 
-    store.gnt = 1;
+    a = 32'h4818e200; // 156 552.0
+    b = 32'h40200000;// 2.5
+    
+    #TCP;
 
-    source_stream_ctrl.addressgen_ctrl.base_addr = 0;
-    source_stream_ctrl.addressgen_ctrl.trans_size = 3;
-    source_stream_ctrl.addressgen_ctrl.line_stride = 12;
-    source_stream_ctrl.addressgen_ctrl.line_length = 1;
-    source_stream_ctrl.addressgen_ctrl.feat_stride = 0;
-    source_stream_ctrl.addressgen_ctrl.feat_length = 3;
-    source_stream_ctrl.addressgen_ctrl.feat_roll = 1;
-    source_stream_ctrl.addressgen_ctrl.loop_outer = 0;
-    source_stream_ctrl.addressgen_ctrl.realign_type = 0;
-    source_stream_ctrl.addressgen_ctrl.line_length_remainder = 0;
+    a = 32'h40b80000; // 5.75
+    b = 32'h4311cccd;// 145.8
+    
+    #TCP;
 
-    sink_stream_ctrl.addressgen_ctrl.base_addr = 0;
-    sink_stream_ctrl.addressgen_ctrl.trans_size = 3;
-    sink_stream_ctrl.addressgen_ctrl.line_stride = 12;
-    sink_stream_ctrl.addressgen_ctrl.line_length = 1;
-    sink_stream_ctrl.addressgen_ctrl.feat_stride = 0;
-    sink_stream_ctrl.addressgen_ctrl.feat_length = 3;
-    sink_stream_ctrl.addressgen_ctrl.feat_roll = 1;
-    sink_stream_ctrl.addressgen_ctrl.loop_outer = 0;
-    sink_stream_ctrl.addressgen_ctrl.realign_type = 0;
-    sink_stream_ctrl.addressgen_ctrl.line_length_remainder = 0;
+    a = 32'h3acc78ea; // 0.00156
+    b = 32'h44d2f4cd; // 1687.65
+    
+    #TCP;
+    
+    operands_valid = 1'b0;
+    a = 32'h00000000; // 0.0
+    b = 32'h00000000;
 
-    source_stream_ctrl.req_start = 1;
-    sink_stream_ctrl.req_start = 1;
-
-    #TCP source_stream_ctrl.req_start = 0;
-    #TCP sink_stream_ctrl.req_start = 0;    
-
-    #(40*TCP) $finish;
+    #(10*TCP);
+    $finish;
 end
 
-hwpe_test #(
-  .DATA_WIDTH(32),
-  .NB_TCDM_PORTS(1)
-) dut (
-  .clk_i(clk),
-  .rst_ni(rst_n),
-  .clear_i(clear),
-
-  .tcdm_master_load(load[0]),
-  .tcdm_master_store(store),
-
-  .load_fifo_flags_o(load_fifo_flags),
-
-  .source_stream_ctrl_i(source_stream_ctrl),
-  .source_stream_flags_o(source_stream_flags),
-
-  .sink_stream_ctrl_i(sink_stream_ctrl),
-  .sink_stream_flags_o(sink_stream_flags),
-
-  .store_fifo_flags_o(store_fifo_flags)
-);
-
-tb_dummy_memory #(
-  .MP(1),
-  .MEMORY_SIZE(128),
-  .BASE_ADDR(0),
-  .PROB_STALL(0.1),
-  .TCP(TCP),
-  .TA(0.2ns),
-  .TT(0.8ns),
-  .INSTRUMENTATION(0)
-) dummy_memory_i (
-  .clk_i(clk),
-  .randomize_i(randomize_i),
-  .enable_i(1),
-  .tcdm(load)
+vfpu vfpu_engine (
+    .clk_i(clk),
+    .rst_ni(rst_n),
+    
+    .operandA_i(operandA),
+    .operandB_i(operandB),
+    .result_o(result),
+    
+    .ctrl_vfpu_i(ctrl_vfpu),
+    .flags_vfpu_o(flags_vfpu),
+    
+    .operands_valid_i(operands_valid),
+    .ready_o(ready),
+    .done_o(valid)
 );
 
 endmodule

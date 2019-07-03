@@ -34,8 +34,8 @@ module vfpu_norm
    // Normalization                                                           //
    /////////////////////////////////////////////////////////////////////////////
 
-   logic [C_MANT_PRENORM_IND-1:0]         Mant_leadingOne_D;
-   logic                                  Mant_zero_S;
+   logic [C_MANT_PRENORM_IND-1:0]                leadingOneIndex;
+   logic                                         isMantissaZero;
    logic [FP_MANT_WIDTH+4:0]                     Mant_norm_D;
    logic signed [FP_EXP_PRENORM_WIDTH-1:0]       Exp_norm_D;
 
@@ -59,18 +59,18 @@ module vfpu_norm
    LOD
    (
      .in_i        ( mantissaPreNorm_i ),
-     .first_one_o ( Mant_leadingOne_D ),
-     .no_ones_o   ( Mant_zero_S       )
+     .first_one_o ( leadingOneIndex   ),
+     .no_ones_o   ( isMantissaZero    )
    );
 
 
    logic                                 Denormals_shift_add_D;
    logic                                 Denormals_exp_add_D;
-   assign Denormals_shift_add_D = ~Mant_zero_S & (exponentPreNorm_i == C_EXP_ZERO) & ((ctrl_vfpu_i.operation != FP_OP_MUL) | (~mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-1] & ~mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-2]));
+   assign Denormals_shift_add_D = ~isMantissaZero & (exponentPreNorm_i == C_EXP_ZERO) & ((ctrl_vfpu_i.operation != FP_OP_MUL) | (~mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-1] & ~mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-2]));
    assign Denormals_exp_add_D   =  mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-2] & (exponentPreNorm_i == C_EXP_ZERO) & ((ctrl_vfpu_i.operation == FP_OP_ADD) | (ctrl_vfpu_i.operation == FP_OP_SUB ));
 
-   assign Denormal_S    = ((FP_EXP_PRENORM_WIDTH)'(signed'(Mant_leadingOne_D)) >= exponentPreNorm_i) || Mant_zero_S;
-   assign Mant_shAmt_D  = Denormal_S ? exponentPreNorm_i + Denormals_shift_add_D : Mant_leadingOne_D;
+   assign Denormal_S    = ((FP_EXP_PRENORM_WIDTH)'(signed'(leadingOneIndex)) >= exponentPreNorm_i) || isMantissaZero;
+   assign Mant_shAmt_D  = Denormal_S ? exponentPreNorm_i + Denormals_shift_add_D : leadingOneIndex;
    assign Mant_shAmt2_D = {Mant_shAmt_D[$high(Mant_shAmt_D)], Mant_shAmt_D} + (FP_MANT_WIDTH+4+1);
 
    //Shift mantissa
@@ -91,7 +91,7 @@ module vfpu_norm
      end
 
    //adjust exponent
-   assign Exp_norm_D = exponentPreNorm_i - (FP_EXP_PRENORM_WIDTH)'(signed'(Mant_leadingOne_D)) + 1 + Denormals_exp_add_D;
+   assign Exp_norm_D = exponentPreNorm_i - (FP_EXP_PRENORM_WIDTH)'(signed'(leadingOneIndex)) + 1 + Denormals_exp_add_D;
    //Explanation of the +1 since I'll probably forget:
    //we get numbers in the format xx.x...
    //but to make things easier we interpret them as

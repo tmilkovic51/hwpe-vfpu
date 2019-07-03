@@ -15,6 +15,23 @@ module vfpu_lod
   output logic                     no_ones_o
 );
 
+
+
+always_comb
+begin
+first_one_o = 0;
+   for (int i = 0; i < WIDTH; i++)
+   begin
+      if (in_i[i])
+      begin
+         first_one_o = WIDTH-1-i;
+      end
+   end
+end
+
+assign no_ones_o = ~(| in_i);
+
+/*
   localparam NUM_LEVELS = $clog2(WIDTH);
 
   logic [WIDTH-1:0] [NUM_LEVELS-1:0]         index_lut;
@@ -80,5 +97,5 @@ module vfpu_lod
   assign first_one_o = index_nodes[0];
   assign no_ones_o         = ~sel_nodes[0];
   
-
+*/
 endmodule

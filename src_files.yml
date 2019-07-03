@@ -26,4 +26,5 @@ tb_hwpe-test:
   ]
   files: [
     tb/hwpe_test_tb.sv,
+    tb/vfpu_lod_tb.sv,
   ]
