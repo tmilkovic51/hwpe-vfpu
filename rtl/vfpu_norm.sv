@@ -27,32 +27,28 @@ module vfpu_norm
 );
 
 //======================================================//
-//                      LOGIC                           //
+//               NORMALIZATION                          //
 //======================================================//
-
-   /////////////////////////////////////////////////////////////////////////////
-   // Normalization                                                           //
-   /////////////////////////////////////////////////////////////////////////////
 
    logic [C_MANT_PRENORM_IND-1:0]                leadingOneIndex;
    logic                                         isMantissaZero;
    logic [FP_MANT_WIDTH+4:0]                     Mant_norm_D;
    logic signed [FP_EXP_PRENORM_WIDTH-1:0]       Exp_norm_D;
 
-   //trying out stuff for denormals
-   logic signed [FP_EXP_PRENORM_WIDTH-1:0]       Mant_shAmt_D;
+   // trying out stuff for denormals
+   logic signed [FP_EXP_PRENORM_WIDTH-1:0]       shiftAmount;
    logic signed [FP_EXP_PRENORM_WIDTH:0]         Mant_shAmt2_D;
 
    logic [FP_EXP_WIDTH-1:0]                      Exp_final_D;
    logic signed [FP_EXP_PRENORM_WIDTH-1:0]       Exp_rounded_D;
 
-   //sticky bit
+   // sticky bit
    logic                                  Mant_sticky_D;
 
    logic                                  Denormal_S;
    logic                                  Mant_renorm_S;
 
-   //Detect leading one
+   // detect leading one
    vfpu_lod
    #(
      .WIDTH(FP_MANT_PRENORM_WIDTH))
@@ -69,25 +65,23 @@ module vfpu_norm
    assign Denormals_shift_add_D = ~isMantissaZero & (exponentPreNorm_i == C_EXP_ZERO) & ((ctrl_vfpu_i.operation != FP_OP_MUL) | (~mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-1] & ~mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-2]));
    assign Denormals_exp_add_D   =  mantissaPreNorm_i[FP_MANT_PRENORM_WIDTH-2] & (exponentPreNorm_i == C_EXP_ZERO) & ((ctrl_vfpu_i.operation == FP_OP_ADD) | (ctrl_vfpu_i.operation == FP_OP_SUB ));
 
-   assign Denormal_S    = ((FP_EXP_PRENORM_WIDTH)'(signed'(leadingOneIndex)) >= exponentPreNorm_i) || isMantissaZero;
-   assign Mant_shAmt_D  = Denormal_S ? exponentPreNorm_i + Denormals_shift_add_D : leadingOneIndex;
-   assign Mant_shAmt2_D = {Mant_shAmt_D[$high(Mant_shAmt_D)], Mant_shAmt_D} + (FP_MANT_WIDTH+4+1);
+   assign shiftAmount  = leadingOneIndex;
 
-   //Shift mantissa
+   // shift mantissa
    always_comb
      begin
         logic [FP_MANT_PRENORM_WIDTH+FP_MANT_WIDTH+4:0] temp;
-        temp = ((FP_MANT_PRENORM_WIDTH+FP_MANT_WIDTH+4+1)'(mantissaPreNorm_i) << (Mant_shAmt2_D) );
+        temp = ((FP_MANT_PRENORM_WIDTH+FP_MANT_WIDTH+4+1)'(mantissaPreNorm_i) << (shiftAmount) );
         Mant_norm_D = temp[FP_MANT_PRENORM_WIDTH+FP_MANT_WIDTH+4:FP_MANT_PRENORM_WIDTH];
      end
 
    always_comb
      begin
         Mant_sticky_D = 1'b0;
-        if (Mant_shAmt2_D <= 0)
+        if (shiftAmount <= 0)
           Mant_sticky_D = | mantissaPreNorm_i;
-        else if (Mant_shAmt2_D <= FP_MANT_PRENORM_WIDTH)
-          Mant_sticky_D = | (mantissaPreNorm_i << (Mant_shAmt2_D));
+        else if (shiftAmount <= FP_MANT_PRENORM_WIDTH)
+          Mant_sticky_D = | (mantissaPreNorm_i << (shiftAmount));
      end
 
    //adjust exponent
@@ -100,6 +94,9 @@ module vfpu_norm
    assign Exp_rounded_D = Exp_norm_D + Mant_renorm_S;
    assign Exp_final_D   = Exp_rounded_D[FP_EXP_WIDTH-1:0];
 
+//======================================================//
+//               OVERFLOW/UNDERFLOW                     //
+//======================================================//
 
    always_comb //detect exponent over/underflow
      begin
@@ -115,9 +112,9 @@ module vfpu_norm
           end
      end
 
-   /////////////////////////////////////////////////////////////////////////////
-   // Rounding                                                                //
-   /////////////////////////////////////////////////////////////////////////////
+//======================================================//
+//                    ROUNDING                          //
+//======================================================//
 
    logic [FP_MANT_WIDTH:0]   Mant_upper_D;
    logic [3:0]        Mant_lower_D;
@@ -152,9 +149,9 @@ module vfpu_norm
    assign Mant_upperRounded_D = Mant_upper_D + Mant_roundUp_S;
    assign Mant_renorm_S       = Mant_upperRounded_D[FP_MANT_WIDTH+1];
 
-   /////////////////////////////////////////////////////////////////////////////
-   // Output Assignments                                                      //
-   /////////////////////////////////////////////////////////////////////////////
+//======================================================//
+//               OUTPUT ASSIGNMENTS                    //
+//======================================================//
    assign signPostNorm_o = signPreNorm_i;
    assign exponentPostNorm_o  = Exp_final_D;
    assign mantissaPostNorm_o = Mant_upperRounded_D >> (Mant_renorm_S & ~Denormal_S);

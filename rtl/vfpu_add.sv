@@ -14,8 +14,8 @@ module vfpu_add
   input logic                                       signB_i,
   input logic [FP_EXP_WIDTH-1:0]                    exponentA_i,
   input logic [FP_EXP_WIDTH-1:0]                    exponentB_i,
-  input logic [FP_MANT_WIDTH-1+1:0]                 mantissaA_i, // +1 because of hidden one
-  input logic [FP_MANT_WIDTH-1+1:0]                 mantissaB_i, // +1 because of hidden one
+  input logic [FP_MANT_WIDTH-1+1:0]                 mantissaA_i, // +1 because of implied bit
+  input logic [FP_MANT_WIDTH-1+1:0]                 mantissaB_i, // +1 because of implied bit
 
   // resiult
   output logic                                      signPreNorm_o,
@@ -27,13 +27,13 @@ module vfpu_add
 );
 
 //======================================================//
-//                         SIGNALS                      //
+//           EXPONENT COMPARISON AND DIFFERENCE         //
 //======================================================//
    logic                        signNorm;
    logic                        exponentA_gt_exponentB;
    logic                        exponents_equal;
    logic [FP_EXP_WIDTH-1:0]     exponent_diff;
-   logic [FP_EXP_WIDTH-1:0]     exponentPreNorm;
+   logic [FP_EXP_WIDTH-1:0]     greaterExponent;
 
    assign exponentA_gt_exponentB  = exponentA_i > exponentB_i;
    assign exponents_equal = exponent_diff == 0;
@@ -43,88 +43,95 @@ module vfpu_add
         if (exponentA_gt_exponentB)
           begin
              exponent_diff   = exponentA_i - exponentB_i;
-             exponentPreNorm = exponentA_i;
+             greaterExponent = exponentA_i;
           end
         else
           begin
              exponent_diff   = exponentB_i - exponentA_i;
-             exponentPreNorm = exponentB_i;
+             greaterExponent = exponentB_i;
           end
      end // always_comb
 
-   /////////////////////////////////////////////////////////////////////////////
-   // Mantissa operations
-   /////////////////////////////////////////////////////////////////////////////
+//======================================================//
+//     MANTISSA SHIFTING AND ADDITION/SUBTRACTION       //
+//======================================================//
 
-   logic                            Mant_agtb_S;
-   logic [MANT_SHIFTIN_WIDTH-1:0]  Mant_shiftIn_D;
-   logic [MANT_SHIFTED_WIDTH-1:0]  Mant_shifted_D;
-   logic                            Mant_sticky_D;
-   logic [MANT_SHIFTED_WIDTH-1:0]  Mant_unshifted_D;
+   // shifter related signals
+   logic                           mantissaA_gt_mantissaB;
+   logic [MANT_SHIFTIN_WIDTH-1:0]  smallerMantissa;
+   logic [MANT_SHIFTED_WIDTH-1:0]  shiftedMantissa;
+   logic                           mantissaStickyBit;
+   logic [MANT_SHIFTED_WIDTH-1:0]  biggerMantissa;
 
-   //Main Adder
-   logic [MANT_ADDIN_WIDTH-1:0]   Mant_addInA_D;
-   logic [MANT_ADDIN_WIDTH-1:0]   Mant_addInB_D;
-   logic [MANT_ADDOUT_WIDTH-1:0]  Mant_addOut_D;
+   // adder related signals
+   logic [MANT_ADDIN_WIDTH-1:0]    adderInputA;
+   logic [MANT_ADDIN_WIDTH-1:0]    adderInputB;
+   logic [MANT_ADDOUT_WIDTH-1:0]   adderOutput;
 
-   logic [FP_MANT_PRENORM_WIDTH-1:0] Mant_prenorm_D;
+   logic [FP_MANT_PRENORM_WIDTH-1:0] addedMantissa;
 
-   //Inversion and carry for Subtraction
-   logic        Mant_addCarryIn_D;
-   logic        Mant_invA_S;
-   logic        Mant_invB_S;
+   // 2's complement for subtraction
+   logic        adderCarryIn;
+   logic        invertMantissaA;
+   logic        invertMantissaB;
 
-   logic        Subtract_S;
+   logic        areSignsDifferent;
 
-   //Shift the number with the smaller exponent to the right
-   assign Mant_agtb_S      = mantissaA_i > mantissaB_i;
-   assign Mant_unshifted_D = {(exponentA_gt_exponentB ? mantissaA_i : mantissaB_i), 3'b0};
-   assign Mant_shiftIn_D   = {(exponentA_gt_exponentB ? mantissaB_i : mantissaA_i), 2'b0};
+   // shift the number with the smaller exponent to the right
+   assign mantissaA_gt_mantissaB    = mantissaA_i > mantissaB_i;
+   assign biggerMantissa            = {(exponentA_gt_exponentB ? mantissaA_i : mantissaB_i), 3'b0};
+   assign smallerMantissa           = {(exponentA_gt_exponentB ? mantissaB_i : mantissaA_i), 2'b0};
 
 
-   always_comb //sticky bit
+   always_comb // sticky bit calculation
      begin
-        Mant_sticky_D = 1'b0;
-        if (exponent_diff >= (FP_MANT_WIDTH+3)) // 23 + guard, round, sticky
-          Mant_sticky_D = | Mant_shiftIn_D;
+        mantissaStickyBit = 1'b0;
+        if (exponent_diff >= (FP_MANT_WIDTH+3)) // 23 bits, + guard, round, sticky
+          mantissaStickyBit = | smallerMantissa;
         else
-          Mant_sticky_D = | (Mant_shiftIn_D << ((FP_MANT_WIDTH+3) - exponent_diff));
+          mantissaStickyBit = | (smallerMantissa << ((FP_MANT_WIDTH+3) - exponent_diff));
      end
-   assign Mant_shifted_D = {(Mant_shiftIn_D >> exponent_diff), Mant_sticky_D};
+     
+   // right shift mantissa of smaller operand
+   assign shiftedMantissa = {(smallerMantissa >> exponent_diff), mantissaStickyBit};
+
+//======================================================//
+//           INVERTING MANTISSA FOR SUBTRACTION         //
+//======================================================//
 
    always_comb
      begin
-        Mant_invA_S = '0;
-        Mant_invB_S = '0;
-        if (Subtract_S)
+        invertMantissaA = '0;
+        invertMantissaB = '0;
+        if (areSignsDifferent)
           begin
              if (exponentA_gt_exponentB)
-               Mant_invA_S = 1'b1;
+               invertMantissaA = 1'b1;
              else if (exponents_equal)
                begin
-                 if (Mant_agtb_S)
-                   Mant_invB_S = 1'b1;
+                 if (mantissaA_gt_mantissaB)
+                   invertMantissaB = 1'b1;
                  else
-                   Mant_invA_S = 1'b1;
+                   invertMantissaA = 1'b1;
                end
              else
-               Mant_invA_S = 1'b1;
-          end // if (Subtract_S)
+               invertMantissaA = 1'b1;
+          end // if (areSignsDifferent)
      end // always_comb begin
 
-   assign Mant_addCarryIn_D = Subtract_S;
-   assign Mant_addInA_D     = (Mant_invA_S) ? ~Mant_shifted_D   : Mant_shifted_D;
-   assign Mant_addInB_D     = (Mant_invB_S) ? ~Mant_unshifted_D : Mant_unshifted_D;
+   assign adderCarryIn = areSignsDifferent;
+   assign adderInputA      = (invertMantissaA) ? ~shiftedMantissa   : shiftedMantissa;
+   assign adderInputB      = (invertMantissaB) ? ~biggerMantissa : biggerMantissa;
 
-   assign Mant_addOut_D     = Mant_addInA_D + Mant_addInB_D + Mant_addCarryIn_D;
+   assign adderOutput      = adderInputA + adderInputB + adderCarryIn;
 
-   assign Mant_prenorm_D    = {(Mant_addOut_D[MANT_ADDOUT_WIDTH-1] & ~Subtract_S), Mant_addOut_D[MANT_ADDOUT_WIDTH-2:0], 20'b0};
+   assign addedMantissa    = {(adderOutput[MANT_ADDOUT_WIDTH-1] & ~areSignsDifferent), adderOutput[MANT_ADDOUT_WIDTH-2:0], 20'b0};
 
-   /////////////////////////////////////////////////////////////////////////////
-   // Sign operations
-   /////////////////////////////////////////////////////////////////////////////
+//======================================================//
+//                    CALCULATE SIGN                    //
+//======================================================//
 
-   assign Subtract_S = signA_i ^ signB_i;
+   assign areSignsDifferent = signA_i ^ signB_i;
 
    always_comb
      begin
@@ -133,23 +140,23 @@ module vfpu_add
           signNorm = signA_i;
         else if (exponents_equal)
           begin
-             if (Mant_agtb_S)
+             if (mantissaA_gt_mantissaB)
                signNorm = signA_i;
              else
                signNorm = signB_i;
           end
-        else //Exp_a < Exp_b
+        else
           signNorm = signB_i;
      end
 
-   /////////////////////////////////////////////////////////////////////////////
-   // Output Assignments
-   /////////////////////////////////////////////////////////////////////////////
+//======================================================//
+//                     OUTPUT ASSIGNMENTS               //
+//======================================================//
 
-   assign signPreNorm_o = signNorm;
-   assign exponentPreNorm_o  = signed'({2'b0, exponentPreNorm});
-   assign mantissaPreNorm_o = Mant_prenorm_D;
+   assign signPreNorm_o         = signNorm;
+   assign exponentPreNorm_o     = signed'({2'b0, greaterExponent});
+   assign mantissaPreNorm_o     = addedMantissa;
    
-   assign done_o = operandsReady_i;
+   assign done_o                = operandsReady_i;
 
 endmodule
